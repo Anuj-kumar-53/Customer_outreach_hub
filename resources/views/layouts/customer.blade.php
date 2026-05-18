@@ -30,8 +30,16 @@
                         class="text-sm font-medium {{ request()->routeIs('customer.leaderboard') ? 'text-sky-700' : 'text-gray-600 hover:text-sky-700' }}">
                         {{ __('Leaderboard') }}
                     </a>
+                    <a href="{{ route('customer.coupon-shop') }}"
+                        class="text-sm font-medium {{ request()->routeIs('customer.coupon-shop') ? 'text-sky-700' : 'text-gray-600 hover:text-sky-700' }}">
+                        {{ __('Coupon Shop') }}
+                    </a>
+                    <a href="{{ route('customer.my-coupons') }}"
+                        class="text-sm font-medium {{ request()->routeIs('customer.my-coupons') ? 'text-sky-700' : 'text-gray-600 hover:text-sky-700' }}">
+                        {{ __('My Coupons') }}
+                    </a>
                     <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-900"
-                        title="{{ __('Reward points') }}">
+                        title="{{ __('Reward points') }}" id="nav-reward-points">
                         {{ (int) (Auth::user()->reward_points ?? 0) }} {{ __('pts') }}
                     </span>
                     <span class="text-sm text-gray-500 hidden sm:inline">|</span>

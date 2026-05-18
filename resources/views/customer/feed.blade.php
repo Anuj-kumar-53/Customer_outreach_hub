@@ -62,220 +62,7 @@
     @else
         <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ($campaigns as $campaign)
-                <article
-                    class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow border border-gray-100 transition duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                    <div class="aspect-video w-full overflow-hidden bg-gray-200">
-                        @if ($campaign->image)
-                            <img src="{{ asset('storage/'.$campaign->image) }}" alt="{{ $campaign->title }}"
-                                class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
-                        @else
-                            <div
-                                class="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400">
-                                <svg class="h-12 w-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <span class="text-xs font-medium">{{ __('No image') }}</span>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="flex flex-1 flex-col p-5">
-                        <h2 class="text-lg font-semibold text-gray-900 line-clamp-2">{{ $campaign->title }}</h2>
-                        <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-sky-700">{{ $campaign->category }}
-                        </p>
-                        <p class="mt-3 text-sm text-gray-600 line-clamp-3 flex-1">{{ $campaign->description }}</p>
-                        <dl class="mt-4 space-y-2 border-t border-gray-100 pt-4 text-sm text-gray-600">
-                            <div class="flex justify-between gap-2">
-                                <dt class="text-gray-500">{{ __('Business') }}</dt>
-                                <dd class="font-medium text-gray-900 text-right">
-                                    <span class="inline-flex flex-wrap items-center justify-end gap-1">
-                                        {{ $campaign->business?->business_name ?? __('Unknown') }}
-                                        @if ($campaign->business?->verified_at)
-                                            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-800" title="{{ __('Verified business') }}">{{ __('Verified') }}</span>
-                                        @endif
-                                    </span>
-                                </dd>
-                            </div>
-                            <div class="flex justify-between gap-2">
-                                <dt class="text-gray-500">{{ __('Expires') }}</dt>
-                                <dd class="font-medium text-gray-900">{{ $campaign->expiry_date?->format('M j, Y') }}</dd>
-                            </div>
-                            <div class="flex justify-between gap-2">
-                                <dt class="text-gray-500">{{ __('Posted') }}</dt>
-                                <dd class="font-medium text-gray-900">{{ $campaign->created_at->format('M j, Y') }}</dd>
-                            </div>
-                        </dl>
-
-                        @php
-                            $referralUrl = route('campaign.public', $campaign).'?'.http_build_query(['ref' => auth()->id()]);
-                            $shareText = rawurlencode($campaign->title.' — '.__('Join me on').' '.config('app.name'));
-                            $whatsappHref =
-                                'https://wa.me/?text='.rawurlencode($campaign->title."\n".$referralUrl);
-                            $twitterHref =
-                                'https://twitter.com/intent/tweet?text='.$shareText.'&url='.rawurlencode($referralUrl);
-                        @endphp
-
-                        <div class="mt-4 rounded-xl border border-sky-100 bg-sky-50/80 p-4">
-                            <p class="text-xs font-semibold uppercase tracking-wide text-sky-800">{{ __('Refer & earn') }}</p>
-                            <p class="mt-1 break-all text-xs text-gray-600">{{ $referralUrl }}</p>
-                            <div class="mt-3 flex flex-wrap gap-2">
-                                <a href="{{ route('campaign.public', $campaign) }}?{{ http_build_query(['ref' => auth()->id()]) }}"
-                                    target="_blank" rel="noopener"
-                                    class="inline-flex flex-1 min-w-[8rem] justify-center rounded-lg bg-sky-600 px-3 py-2 text-xs font-semibold text-white shadow hover:bg-sky-700">
-                                    {{ __('Open / share link') }}
-                                </a>
-                                <button type="button" data-copy-url="{{ $referralUrl }}"
-                                    class="copy-referral-url inline-flex flex-1 min-w-[8rem] justify-center rounded-lg border border-sky-200 bg-white px-3 py-2 text-xs font-semibold text-sky-800 hover:bg-sky-100">
-                                    {{ __('Copy link') }}
-                                </button>
-                                <a href="{{ $whatsappHref }}" target="_blank" rel="noopener"
-                                    class="inline-flex flex-1 min-w-[8rem] justify-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-100">
-                                    {{ __('WhatsApp') }}
-                                </a>
-                                <a href="{{ $twitterHref }}" target="_blank" rel="noopener"
-                                    class="inline-flex flex-1 min-w-[8rem] justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:bg-gray-50">
-                                    {{ __('X / Twitter') }}
-                                </a>
-                            </div>
-                            <p class="copy-referral-toast mt-2 hidden text-xs font-medium text-emerald-700" aria-live="polite"></p>
-                        </div>
-
-                        @php
-                            $hasLiked = $campaign->likes->isNotEmpty();
-                            $hasSaved = $campaign->saves->isNotEmpty();
-                        @endphp
-
-                        {{-- Likes + Saves --}}
-                        <div class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-4">
-                            <div class="flex items-center gap-2">
-                                <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-800">
-                                    {{ $campaign->likes_count }} {{ \Illuminate\Support\Str::plural('Like', $campaign->likes_count) }}
-                                </span>
-
-                                @if ($hasLiked)
-                                    <form method="POST" action="{{ route('campaigns.unlike', $campaign) }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="inline-flex items-center rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-100">
-                                            {{ __('Unlike') }}
-                                        </button>
-                                    </form>
-                                @else
-                                    <form method="POST" action="{{ route('campaigns.like', $campaign) }}">
-                                        @csrf
-                                        <button type="submit"
-                                            class="inline-flex items-center rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-700 hover:bg-sky-100">
-                                            {{ __('Like') }}
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-
-                            <div>
-                                @if ($hasSaved)
-                                    <form method="POST" action="{{ route('campaigns.unsave', $campaign) }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100">
-                                            {{ __('Unsave') }}
-                                        </button>
-                                    </form>
-                                @else
-                                    <form method="POST" action="{{ route('campaigns.save', $campaign) }}">
-                                        @csrf
-                                        <button type="submit"
-                                            class="inline-flex items-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
-                                            {{ __('Save') }}
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                        </div>
-
-                        {{-- Comments --}}
-                        <div class="mt-5 border-t border-gray-100 pt-4">
-                            <h3 class="text-sm font-semibold text-gray-900">{{ __('Comments') }}</h3>
-
-                            <form method="POST" action="{{ route('campaigns.comments.store', $campaign) }}" class="mt-3">
-                                @csrf
-                                <div class="space-y-2">
-                                    <textarea name="comment" rows="3" maxlength="500"
-                                        class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500"
-                                        placeholder="{{ __('Write a comment…') }}">{{ old('comment') }}</textarea>
-                                    @error('comment')
-                                        <p class="text-sm text-rose-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                                <div class="mt-2 flex justify-end">
-                                    <button type="submit"
-                                        class="inline-flex items-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-black">
-                                        {{ __('Post') }}
-                                    </button>
-                                </div>
-                            </form>
-
-                            <div class="mt-4 border-t border-gray-100 pt-4">
-                                <h4 class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Report a problem') }}</h4>
-                                <form method="POST" action="{{ route('customer.reports.store') }}" class="mt-2 space-y-2">
-                                    @csrf
-                                    <input type="hidden" name="reported_campaign_id" value="{{ $campaign->id }}">
-                                    <select name="category" class="block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-sky-500 focus:ring-sky-500">
-                                        <option value="spam">{{ __('Spam / misleading') }}</option>
-                                        <option value="abuse">{{ __('Abuse / harassment') }}</option>
-                                        <option value="inappropriate_content">{{ __('Inappropriate content') }}</option>
-                                        <option value="fake_business">{{ __('Misleading business') }}</option>
-                                        <option value="other">{{ __('Other') }}</option>
-                                    </select>
-                                    <textarea name="description" rows="2" maxlength="5000" required
-                                        class="block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-sky-500 focus:ring-sky-500"
-                                        placeholder="{{ __('Describe the issue…') }}">{{ old('description') }}</textarea>
-                                    @error('description')
-                                        <p class="text-xs text-rose-600">{{ $message }}</p>
-                                    @enderror
-                                    @error('category')
-                                        <p class="text-xs text-rose-600">{{ $message }}</p>
-                                    @enderror
-                                    @error('target')
-                                        <p class="text-xs text-rose-600">{{ $message }}</p>
-                                    @enderror
-                                    <button type="submit"
-                                        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:bg-gray-50">{{ __('Submit report') }}</button>
-                                </form>
-                            </div>
-
-                            <div class="mt-4 space-y-3">
-                                @forelse ($campaign->comments->sortByDesc('created_at') as $comment)
-                                    <div class="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
-                                        <div class="flex items-start justify-between gap-3">
-                                            <div>
-                                                <p class="text-sm text-gray-900">{{ $comment->comment }}</p>
-                                                <p class="mt-1 text-xs text-gray-500">
-                                                    <span class="font-semibold text-gray-700">{{ $comment->user?->name ?? __('Unknown') }}</span>
-                                                    · {{ $comment->created_at->diffForHumans() }}
-                                                </p>
-                                            </div>
-
-                                            @if ($comment->user_id === auth()->id())
-                                                <form method="POST" action="{{ route('campaigns.comments.destroy', $comment) }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-xs font-semibold text-rose-700 hover:underline">
-                                                        {{ __('Delete') }}
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @empty
-                                    <p class="text-sm text-gray-500">{{ __('No comments yet. Be the first!') }}</p>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div>
-                </article>
+                <x-campaign-post :campaign="$campaign" />
             @endforeach
         </div>
 
@@ -287,22 +74,242 @@
     @push('scripts')
         <script>
             document.addEventListener('click', async function (e) {
-                const btn = e.target.closest('.copy-referral-url');
-                if (!btn) return;
-                const text = btn.getAttribute('data-copy-url');
-                const wrap = btn.closest('.rounded-xl');
-                const toast = wrap ? wrap.querySelector('.copy-referral-toast') : null;
-                try {
-                    await navigator.clipboard.writeText(text);
-                    if (toast) {
-                        toast.textContent = @json(__('Link copied to clipboard.'));
-                        toast.classList.remove('hidden');
-                        setTimeout(() => toast.classList.add('hidden'), 2500);
+                // Handle copy referral URL
+                const copyBtn = e.target.closest('.copy-referral-btn');
+                if (copyBtn) {
+                    const text = copyBtn.getAttribute('data-copy-url');
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = `<svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Copied!`;
+                        setTimeout(() => { copyBtn.innerHTML = originalText; }, 2000);
+                    } catch (err) {
+                        alert(@json(__('Could not copy — select the link manually.')));
                     }
-                } catch (err) {
-                    if (toast) {
-                        toast.textContent = @json(__('Could not copy — select the link manually.'));
-                        toast.classList.remove('hidden');
+                    return;
+                }
+
+                // Close dropdowns if clicking outside
+                if (!e.target.closest('.post-menu-dropdown') && !e.target.closest('.post-menu-btn')) {
+                    document.querySelectorAll('.post-menu-dropdown').forEach(d => d.classList.add('hidden'));
+                }
+                if (!e.target.closest('.share-dropdown') && !e.target.closest('.share-toggle-btn')) {
+                    document.querySelectorAll('.share-dropdown').forEach(d => d.classList.add('hidden'));
+                }
+
+                // Handle post menu toggle
+                const menuBtn = e.target.closest('.post-menu-btn');
+                if (menuBtn) {
+                    const dropdown = menuBtn.nextElementSibling;
+                    document.querySelectorAll('.post-menu-dropdown').forEach(d => { if (d !== dropdown) d.classList.add('hidden') });
+                    dropdown.classList.toggle('hidden');
+                    return;
+                }
+
+                // Handle report button
+                const reportBtn = e.target.closest('.report-btn');
+                if (reportBtn) {
+                    const post = reportBtn.closest('.campaign-post');
+                    post.querySelector('.report-form-container').classList.remove('hidden');
+                    reportBtn.closest('.post-menu-dropdown').classList.add('hidden');
+                    return;
+                }
+
+                // Handle cancel report
+                const cancelReportBtn = e.target.closest('.cancel-report-btn');
+                if (cancelReportBtn) {
+                    cancelReportBtn.closest('.report-form-container').classList.add('hidden');
+                    return;
+                }
+
+                // Handle read more toggle
+                const readMoreBtn = e.target.closest('.read-more-btn');
+                if (readMoreBtn) {
+                    const desc = readMoreBtn.previousElementSibling;
+                    if (desc.classList.contains('line-clamp-2')) {
+                        desc.classList.remove('line-clamp-2');
+                        readMoreBtn.textContent = @json(__('Show less'));
+                    } else {
+                        desc.classList.add('line-clamp-2');
+                        readMoreBtn.textContent = @json(__('...more'));
+                    }
+                    return;
+                }
+
+                // Handle share toggle
+                const shareToggleBtn = e.target.closest('.share-toggle-btn');
+                if (shareToggleBtn) {
+                    const dropdown = shareToggleBtn.nextElementSibling;
+                    document.querySelectorAll('.share-dropdown').forEach(d => { if (d !== dropdown) d.classList.add('hidden') });
+                    dropdown.classList.toggle('hidden');
+                    return;
+                }
+
+                // Handle comment section toggle
+                const toggleCommentBtn = e.target.closest('.toggle-comment-btn');
+                if (toggleCommentBtn) {
+                    const post = toggleCommentBtn.closest('.campaign-post');
+                    const commentsSection = post.querySelector('.comments-section');
+                    commentsSection.classList.toggle('hidden');
+                    if (!commentsSection.classList.contains('hidden')) {
+                        commentsSection.querySelector('input[name="comment"]')?.focus();
+                    }
+                    return;
+                }
+            });
+
+            // Handle AJAX form submissions for Like, Save, Comment, Delete Comment, Report
+            document.addEventListener('submit', async function(e) {
+                if (e.target.matches('.like-form, .save-form, .comment-form, .delete-comment-form, .report-form')) {
+                    e.preventDefault();
+                    const form = e.target;
+                    const post = form.closest('.campaign-post');
+                    
+                    const isLike = form.matches('.like-form');
+                    const isSave = form.matches('.save-form');
+                    const isComment = form.matches('.comment-form');
+                    const isDeleteComment = form.matches('.delete-comment-form');
+                    const isReport = form.matches('.report-form');
+
+                    let submitBtn = form.querySelector('button[type="submit"]');
+
+                    if (isLike || isSave) {
+                        const wasActive = form.getAttribute(isLike ? 'data-liked' : 'data-saved') === 'true';
+                        const icon = submitBtn.querySelector('svg');
+                        
+                        // Capture formData BEFORE modifying the form DOM
+                        const formData = new FormData(form);
+                        const submitAction = form.action;
+                        fetch(submitAction, { method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest'} })
+                            .catch(err => console.error(err));
+
+                        if (isLike) {
+                            form.setAttribute('data-liked', wasActive ? 'false' : 'true');
+                            const countSpan = post.querySelector('.like-count');
+                            let count = parseInt(countSpan.getAttribute('data-count'));
+                            
+                            if (wasActive) {
+                                form.querySelector('input[name="_method"]')?.remove();
+                                submitBtn.classList.remove('text-sky-600', 'bg-gray-100');
+                                submitBtn.classList.add('text-gray-500');
+                                icon.classList.remove('fill-current');
+                                icon.classList.add('fill-none', 'stroke-current', 'stroke-2');
+                                count--;
+                            } else {
+                                form.insertAdjacentHTML('beforeend', '<input type="hidden" name="_method" value="DELETE">');
+                                submitBtn.classList.remove('text-gray-500');
+                                submitBtn.classList.add('text-sky-600', 'bg-gray-100');
+                                icon.classList.remove('fill-none', 'stroke-current', 'stroke-2');
+                                icon.classList.add('fill-current');
+                                count++;
+                            }
+                            countSpan.setAttribute('data-count', count);
+                            countSpan.textContent = count + (count === 1 ? ' Like' : ' Likes');
+                        } else if (isSave) {
+                            form.setAttribute('data-saved', wasActive ? 'false' : 'true');
+                            const countSpan = post.querySelector('.save-count-text');
+                            let countMatch = countSpan.textContent.match(/\d+/);
+                            let count = countMatch ? parseInt(countMatch[0]) : 0;
+
+                            if (wasActive) {
+                                form.querySelector('input[name="_method"]')?.remove();
+                                submitBtn.classList.remove('text-amber-600', 'bg-gray-100');
+                                submitBtn.classList.add('text-gray-500');
+                                icon.classList.remove('fill-current');
+                                icon.classList.add('fill-none', 'stroke-current', 'stroke-2');
+                                count = Math.max(0, count - 1);
+                            } else {
+                                form.insertAdjacentHTML('beforeend', '<input type="hidden" name="_method" value="DELETE">');
+                                submitBtn.classList.remove('text-gray-500');
+                                submitBtn.classList.add('text-amber-600', 'bg-gray-100');
+                                icon.classList.remove('fill-none', 'stroke-current', 'stroke-2');
+                                icon.classList.add('fill-current');
+                                count++;
+                            }
+                            countSpan.textContent = count + (count === 1 ? ' Save' : ' Saves');
+                        }
+                    }
+                    
+                    if (isComment) {
+                        const input = form.querySelector('input[name="comment"]');
+                        const commentText = input.value;
+                        if (!commentText.trim()) return;
+                        
+                        // Capture formData BEFORE clearing the input
+                        const formData = new FormData(form);
+                        const submitAction = form.action;
+                        input.value = '';
+                        
+                        // Optimistic append
+                        const list = post.querySelector('.comments-list');
+                        const noComments = list.querySelector('.no-comments-text');
+                        if (noComments) noComments.remove();
+                        
+                        const userName = @json(auth()->user()->name);
+                        const initial = userName.charAt(0).toUpperCase();
+                        
+                        const html = `
+                            <div class="comment-item flex gap-3 opacity-50 transition-opacity" data-pending="true">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-gray-500 font-semibold text-xs border border-gray-300 mt-0.5">
+                                    ${initial}
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-white border border-gray-100 shadow-sm rounded-2xl rounded-tl-none px-3.5 py-2 inline-block">
+                                        <p class="text-[13px] font-semibold text-gray-900">${userName}</p>
+                                        <p class="text-sm text-gray-800 mt-0.5">${commentText.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>
+                                    </div>
+                                    <div class="flex items-center gap-3 mt-1 px-1">
+                                        <span class="text-[11px] font-medium text-gray-500">Just now</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        list.insertAdjacentHTML('afterbegin', html);
+                        
+                        // Update counter
+                        const countSpan = post.querySelector('.comment-count-text');
+                        let countMatch = countSpan.textContent.match(/\d+/);
+                        let count = countMatch ? parseInt(countMatch[0]) + 1 : 1;
+                        countSpan.textContent = count + (count === 1 ? ' Comment' : ' Comments');
+
+                        try {
+                            const res = await fetch(submitAction, { method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'} });
+                            if (res.ok) {
+                                list.querySelector('[data-pending="true"]')?.classList.remove('opacity-50');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+
+                    if (isDeleteComment) {
+                        const item = form.closest('.comment-item');
+                        item.style.display = 'none'; // hide immediately
+                        
+                        // Update counter
+                        const countSpan = post.querySelector('.comment-count-text');
+                        let countMatch = countSpan.textContent.match(/\d+/);
+                        let count = countMatch ? Math.max(0, parseInt(countMatch[0]) - 1) : 0;
+                        countSpan.textContent = count + (count === 1 ? ' Comment' : ' Comments');
+
+                        fetch(form.action, { method: 'POST', body: new FormData(form), headers: {'X-Requested-With': 'XMLHttpRequest'} })
+                            .catch(err => { item.style.display = ''; console.error(err); }); // revert on error
+                    }
+
+                    if (isReport) {
+                        const container = form.closest('.report-form-container');
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Submitting...';
+                        
+                        fetch(form.action, { method: 'POST', body: new FormData(form), headers: {'X-Requested-With': 'XMLHttpRequest'} })
+                            .then(() => {
+                                container.innerHTML = `<div class="bg-emerald-50 text-emerald-700 p-4 rounded-xl border border-emerald-100 text-sm font-medium">Thank you. The issue has been reported.</div>`;
+                                setTimeout(() => { container.classList.add('hidden'); }, 3000);
+                            })
+                            .catch(err => {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Submit report';
+                            });
                     }
                 }
             });

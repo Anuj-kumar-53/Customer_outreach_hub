@@ -24,15 +24,7 @@
         </div>
     </div>
 
-    @if ($stats['coupon_eligible'])
-        <div class="mb-6 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-4 text-violet-900 shadow-sm">
-            <p class="font-semibold">{{ __('Eligible for Reward Coupon') }}</p>
-            <p class="mt-1 text-sm">{{ __('You have :pts reward points.', ['pts' => $stats['reward_points']]) }}</p>
-            @if ($stats['coupon_code'])
-                <p class="mt-2 font-mono text-sm font-bold tracking-wide">{{ $stats['coupon_code'] }}</p>
-            @endif
-        </div>
-    @endif
+
 
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
 

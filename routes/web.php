@@ -21,6 +21,7 @@ use App\Http\Controllers\CustomerReferralController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PublicCampaignController;
 use App\Http\Controllers\BusinessAnalyticsController;
+use App\Http\Controllers\CouponShopController;
 use Illuminate\Support\Facades\Route;
 
 // Welcome page
@@ -94,6 +95,12 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::get('/referrals', [CustomerReferralController::class, 'index'])->name('referrals');
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
     Route::post('/reports', [CustomerReportController::class, 'store'])->name('reports.store');
+    
+    // Coupon Shop
+    Route::get('/coupon-shop', [CouponShopController::class, 'index'])->name('coupon-shop');
+    Route::get('/my-coupons', [CouponShopController::class, 'myCoupons'])->name('my-coupons');
+    Route::post('/coupons/{coupon}/buy', [CouponShopController::class, 'buy'])->name('coupons.buy');
+    Route::post('/user-coupons/{userCoupon}/use', [CouponShopController::class, 'use'])->name('user-coupons.use');
 });
 
 Route::middleware(['auth', 'role:customer'])->get('/campaign-feed', [CampaignFeedController::class, 'index'])->name('customer.campaign-feed');

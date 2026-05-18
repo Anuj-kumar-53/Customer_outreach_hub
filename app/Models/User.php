@@ -127,4 +127,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Referral::class, 'referred_user_id');
     }
+
+    public function userCoupons()
+    {
+        return $this->hasMany(UserCoupon::class);
+    }
 }
